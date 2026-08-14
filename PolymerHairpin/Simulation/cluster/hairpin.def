@@ -1,0 +1,18 @@
+Bootstrap: docker
+From: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
+
+%post
+    # Update and install pip packages
+    apt-get update && apt-get install -y python3-pip
+
+    # Install Python packages
+    pip install --upgrade pip
+    pip install numpy matplotlib scikit-learn tqdm argparse numba
+
+%environment
+    export LC_ALL=C
+    export PYTHONUNBUFFERED=1
+
+%runscript
+    echo "Container ready. Run your Python scripts with 'apptainer exec ... python script.py'"
+
