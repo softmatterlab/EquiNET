@@ -11,11 +11,11 @@ The repository contains two applications:
 * a one-dimensional double-well demonstration;
 * a three-dimensional polymer-hairpin model analyzed using time-conditioned E(3)-equivariant graph neural networks (EGNNs).
 
-The repository includes the simulation and inference code, scripts used to generate the datasets, processed data required to reproduce the figures, and Apptainer definition files specifying the computational environments used for the simulations and neural-network training.
+The repository includes simulation and inference code, scripts used to generate the datasets, processed data required to reproduce the figures, and Apptainer definition files specifying the computational environments used for the simulations and neural-network training.
 
 The full polymer-hairpin datasets are computationally intensive to generate and were produced using high-performance computing resources. The simulations are divided into independent batches that can be run in parallel on a compute cluster. The largest dataset used in the paper contains (10^5) trajectories, but substantially smaller datasets already provide good inference results, with approximately 500--1000 trajectories sufficient in many of the cases considered here.
 
-A self-contained Colab notebook is also provided as a computationally lighter demonstration of the complete polymer-hairpin workflow. To make the simulation practical to run interactively, this notebook uses a coarser integration timestep than the production calculations used for the paper. The distinction between the demonstration and production settings is described below.
+A self-contained demonstration notebook is also provided for the polymer-hairpin example. To make the complete workflow practical to run interactively, this notebook uses a coarser integration timestep than the production simulations used for the paper. The distinction between the demonstration and production settings is described below.
 
 ## Installation
 
@@ -37,7 +37,7 @@ For the production calculations, the provided Apptainer definition files can be 
 For example, the polymer-hairpin simulation container can be built with:
 
 ```bash
-apptainer build hairpin.sif PolymerHairpin/Simulation/cluster/hairpin.def
+apptainer build hairpin.sif polymer_hairpin/simulation/cluster/hairpin.def
 ```
 
 Depending on the HPC system, Apptainer images may need to be built outside the cluster or using a remote builder.
@@ -46,8 +46,12 @@ Depending on the HPC system, Apptainer images may need to be built outside the c
 
 ```text
 .
+├── LICENSE
+├── README.md
 ├── double_well
-│   └── double_well_inference.ipynb
+│   ├── double_well_inference.ipynb
+│   ├── protocol_plot.pdf
+│   └── work_entropy.pdf
 │
 ├── polymer_hairpin
 │   ├── hairpin_demo.ipynb
@@ -62,8 +66,12 @@ Depending on the HPC system, Apptainer images may need to be built outside the c
 │   │       └── egnn_cg.py
 │   │
 │   ├── plotting
-│   │   ├── Data
-│   │   └── Plotting_Script
+│   │   ├── data
+│   │   │   ├── Fig_3.npz
+│   │   │   └── Fig_4.npz
+│   │   └── script
+│   │       ├── Fig_3.py
+│   │       └── Fig_4.py
 │   │
 │   └── simulation
 │       ├── cluster
@@ -74,8 +82,6 @@ Depending on the HPC system, Apptainer images may need to be built outside the c
 │       └── src
 │           └── hairpin_simulation.py
 │
-├── LICENSE
-├── README.md
 └── requirements.txt
 ```
 
@@ -120,15 +126,23 @@ polymer_hairpin/
 └── plotting/
 ```
 
-A self-contained Colab demonstration is additionally provided in:
+A self-contained demonstration notebook is additionally provided in:
 
 ```text
 polymer_hairpin/hairpin_demo.ipynb
 ```
 
-## Colab demonstration
+## Demonstration notebook
 
-`hairpin_demo.ipynb` provides a self-contained version of the polymer-hairpin workflow that can be run in Google Colab or locally in Jupyter. It includes trajectory generation, work-distribution sampling, full-coordinate EquiNET inference, coarse-grained inference, and visualization routines.
+`polymer_hairpin/hairpin_demo.ipynb` provides a self-contained version of the polymer-hairpin workflow that can be run in Google Colab or locally in Jupyter.
+
+The notebook includes:
+
+* trajectory generation;
+* work-distribution sampling;
+* full-coordinate EquiNET inference;
+* coarse-grained EquiNET inference;
+* analysis and visualization routines.
 
 To reduce the computational cost of running the complete workflow interactively, the demonstration notebook uses a coarser integration timestep,
 
@@ -146,14 +160,14 @@ The number of integration steps and the storage strides in the demonstration not
 
 For the trajectory simulations, the corresponding settings are:
 
-| Parameter                          | Colab demonstration | Paper calculations |
-| ---------------------------------- | ------------------: | -----------------: |
-| Integration timestep               |              `1e-4` |             `1e-5` |
-| Initial equilibration              |      `17,000` steps |    `170,000` steps |
-| Pulling stage                      |      `60,000` steps |    `600,000` steps |
-| Final equilibration                |      `15,000` steps |    `150,000` steps |
-| Trajectory storage stride          |         `500` steps |       `5000` steps |
-| Time between stored configurations |              `0.05` |             `0.05` |
+| Parameter                          | Demonstration notebook | Paper calculations |
+| ---------------------------------- | ---------------------: | -----------------: |
+| Integration timestep               |                 `1e-4` |             `1e-5` |
+| Initial equilibration              |         `17,000` steps |    `170,000` steps |
+| Pulling stage                      |         `60,000` steps |    `600,000` steps |
+| Final equilibration                |         `15,000` steps |    `150,000` steps |
+| Trajectory storage stride          |            `500` steps |       `5000` steps |
+| Time between stored configurations |                 `0.05` |             `0.05` |
 
 For example,
 
@@ -163,33 +177,35 @@ For example,
 
 so the temporal resolution of the trajectories supplied to EquiNET is the same in the demonstration and production settings.
 
-The Colab notebook is intended as an accessible demonstration of the complete simulation-to-inference workflow. **All numerical results reported in the paper were generated using the finer production timestep `dt = 1e-5` and the corresponding production step counts and storage strides.** The production scripts in `PolymerHairpin/Simulation/` and `PolymerHairpin/Inference/` retain the settings used for the paper.
+The demonstration notebook is intended as an accessible example of the complete simulation-to-inference workflow. **All numerical results reported in the paper were generated using the finer production timestep `dt = 1e-5` and the corresponding production step counts and storage strides.**
+
+The production scripts in `polymer_hairpin/simulation/` and `polymer_hairpin/inference/` retain the numerical settings used for the paper.
 
 ## 1. Generating polymer-hairpin trajectories
 
 The production simulation code is located in:
 
 ```text
-PolymerHairpin/Simulation/src/hairpin_simulation.py
+polymer_hairpin/simulation/src/hairpin_simulation.py
 ```
 
 The polymer hairpin consists of 13 beads evolving in three dimensions.
 
-For the production simulations used in the paper, the integration timestep is
+For the production simulations used in the paper, the integration timestep is:
 
 ```text
 dt = 1e-5
 ```
 
-and a trajectory contains approximately (9\times10^5) integration steps. To reduce storage requirements, configurations are not written at every integration step; instead, the system is stored every 5000 simulation steps.
+A trajectory contains approximately (9\times10^5) integration steps. To reduce storage requirements, configurations are not written at every integration step; instead, the system is stored every 5000 simulation steps.
 
 Thus, the integration timestep and the stored trajectory resolution are different: the dynamics are evolved using all integration steps, while only periodically sampled configurations are saved for subsequent inference.
 
-The self-contained Colab notebook uses the computationally lighter discretization described above and should therefore not be confused with the finer production settings used to generate the published results.
+The self-contained demonstration notebook uses the computationally lighter discretization described above and should therefore not be confused with the finer production settings used to generate the published results.
 
 ### Number of trajectories
 
-The largest datasets used in the paper contain **100,000 independent trajectories**. This represents the maximum dataset size used in our calculations rather than a minimum requirement for obtaining useful results.
+The largest datasets used in the paper contain **100,000 independent trajectories**. This represents the maximum dataset size used in the calculations rather than a minimum requirement for obtaining useful results.
 
 In practice, good inference results are already obtained with substantially fewer trajectories. For many of the cases considered in the paper, approximately **500--1000 trajectories** are sufficient to obtain accurate estimates.
 
@@ -197,18 +213,18 @@ The larger datasets are used primarily to characterize convergence and the behav
 
 ### Running a reduced simulation
 
-For a quick demonstration of the complete workflow, we recommend using:
+For a quick demonstration of the complete workflow, use:
 
 ```text
-PolymerHairpin/Hairpin_Colab_Demo.ipynb
+polymer_hairpin/hairpin_demo.ipynb
 ```
 
-The notebook uses 1000 trajectories by default and a coarser integration timestep to reduce the runtime.
+The notebook uses a reduced computational setup and is intended to make the full pipeline easier to run interactively.
 
-Alternatively, the production simulation script can be run with a reduced number of trajectories:
+Alternatively, the production simulation script can be run directly:
 
 ```bash
-python PolymerHairpin/Simulation/src/hairpin_simulation.py
+python polymer_hairpin/simulation/src/hairpin_simulation.py
 ```
 
 The exact simulation parameters are defined in the simulation script.
@@ -230,13 +246,13 @@ Since the individual trajectories and batches are independent, the calculation i
 The cluster submission script is:
 
 ```text
-PolymerHairpin/Simulation/scripts/submit_hairpin_array.sh
+polymer_hairpin/simulation/scripts/submit_hairpin_array.sh
 ```
 
 For a SLURM-based system, the job array can typically be submitted with:
 
 ```bash
-sbatch PolymerHairpin/Simulation/scripts/submit_hairpin_array.sh
+sbatch polymer_hairpin/simulation/scripts/submit_hairpin_array.sh
 ```
 
 The supplied submission script reflects the HPC environment used for the calculations in the paper and may need to be adapted for another system.
@@ -258,13 +274,13 @@ The number of submitted batches can be reduced depending on the desired dataset 
 After all requested simulation batches have completed, the individual output files can be combined using:
 
 ```text
-PolymerHairpin/Simulation/scripts/merge_hairpin.sh
+polymer_hairpin/simulation/scripts/merge_hairpin.sh
 ```
 
 Run:
 
 ```bash
-bash PolymerHairpin/Simulation/scripts/merge_hairpin.sh
+bash polymer_hairpin/simulation/scripts/merge_hairpin.sh
 ```
 
 The resulting merged dataset is then used as input for the EquiNET inference.
@@ -274,7 +290,7 @@ The resulting merged dataset is then used as input for the EquiNET inference.
 The EquiNET inference code for the polymer hairpin is located in:
 
 ```text
-PolymerHairpin/Inference/src/
+polymer_hairpin/inference/src/
 ```
 
 The main scripts are:
@@ -291,13 +307,13 @@ egnn_cg.py
 The cluster submission script is:
 
 ```text
-PolymerHairpin/Inference/scripts/run_egnn.sh
+polymer_hairpin/inference/scripts/run_egnn.sh
 ```
 
 For a SLURM-based system, the inference job can typically be submitted with:
 
 ```bash
-sbatch PolymerHairpin/Inference/scripts/run_egnn.sh
+sbatch polymer_hairpin/inference/scripts/run_egnn.sh
 ```
 
 Before running the inference, users should check the paths to:
@@ -314,23 +330,44 @@ Full-scale inference can be performed on the largest datasets, but this is not r
 The processed data used to produce the polymer-hairpin figures are provided in:
 
 ```text
-PolymerHairpin/Plotting/Data/
+polymer_hairpin/plotting/data/
+```
+
+The supplied processed data include:
+
+```text
+polymer_hairpin/plotting/data/Fig_3.npz
+polymer_hairpin/plotting/data/Fig_4.npz
 ```
 
 The corresponding plotting scripts are located in:
 
 ```text
-PolymerHairpin/Plotting/Plotting_Script/
+polymer_hairpin/plotting/script/
+```
+
+and are:
+
+```text
+polymer_hairpin/plotting/script/Fig_3.py
+polymer_hairpin/plotting/script/Fig_4.py
+```
+
+For example:
+
+```bash
+python polymer_hairpin/plotting/script/Fig_3.py
+python polymer_hairpin/plotting/script/Fig_4.py
 ```
 
 The plotting scripts operate directly on the supplied processed data. Therefore, reproducing the published figures does **not** require rerunning the full simulations or neural-network training.
 
 ## Recommended workflow
 
-For users interested primarily in testing the method, we recommend starting with the self-contained Colab notebook:
+For users interested primarily in testing the method, we recommend starting with:
 
 ```text
-PolymerHairpin/Hairpin_Colab_Demo.ipynb
+polymer_hairpin/hairpin_demo.ipynb
 ```
 
 This provides the simplest way to run the complete simulation and inference pipeline with reduced computational cost.
@@ -350,7 +387,7 @@ There is therefore no need to generate the full (10^5)-trajectory dataset simply
 
 ## Computational requirements
 
-The production polymer-hairpin simulations reported in the paper use an integration timestep of
+The production polymer-hairpin simulations reported in the paper use:
 
 ```text
 dt = 1e-5
@@ -366,7 +403,7 @@ The maximum dataset used in the paper contains:
 
 These full-scale calculations are best suited to HPC resources. However, this maximum dataset size should not be interpreted as a requirement for obtaining useful results. In many cases, good estimates are already obtained using approximately **500--1000 trajectories**.
 
-The Colab demonstration uses `dt = 1e-4` together with proportionally reduced step counts and storage strides to make the workflow substantially faster while preserving the protocol durations and stored-data time resolution.
+The demonstration notebook uses `dt = 1e-4` together with proportionally reduced step counts and storage strides to make the workflow substantially faster while preserving the protocol durations and stored-data time resolution.
 
 Users interested only in reproducing the published figures do not need access to a cluster, since the processed plotting data are included in the repository.
 
