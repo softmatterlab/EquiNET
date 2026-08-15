@@ -42,10 +42,10 @@ print(f"Split seed:                  {seed}")
 # ================================================================
 traj_fwd_all = np.load(
     os.path.join(data_dir, "traj_fwd.npy"), mmap_mode="r"
-)[:, ::10]
+)
 traj_rev_all = np.load(
     os.path.join(data_dir, "traj_rev.npy"), mmap_mode="r"
-)[:, ::10]
+)
 
 print("Full traj_fwd shape:", traj_fwd_all.shape)
 print("Full traj_rev shape:", traj_rev_all.shape)
