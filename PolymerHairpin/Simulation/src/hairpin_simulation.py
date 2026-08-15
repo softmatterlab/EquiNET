@@ -53,7 +53,7 @@ epsilon_native = 3.0 #was 3
 epsilon_rep = 1.0
 sigma_rep = 0.8
 
-store_stride = 500
+store_stride = 5000
 
 sqrt_2Tdt_over_gamma = np.sqrt(2.0 * kB * T * dt / gamma)
 
