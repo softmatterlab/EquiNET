@@ -46,13 +46,13 @@ Depending on the HPC system, Apptainer images may need to be built outside the c
 
 ```text
 .
-├── DoubleWell
-│   └── DoubleWell_Inference.ipynb
+├── double_well
+│   └── double_well_inference.ipynb
 │
-├── PolymerHairpin
-│   ├── Hairpin_Colab_Demo.ipynb
+├── polymer_hairpin
+│   ├── hairpin_demo.ipynb
 │   │
-│   ├── Inference
+│   ├── inference
 │   │   ├── cluster
 │   │   │   └── hairpin.def
 │   │   ├── scripts
@@ -61,11 +61,11 @@ Depending on the HPC system, Apptainer images may need to be built outside the c
 │   │       ├── egnn.py
 │   │       └── egnn_cg.py
 │   │
-│   ├── Plotting
+│   ├── plotting
 │   │   ├── Data
 │   │   └── Plotting_Script
 │   │
-│   └── Simulation
+│   └── simulation
 │       ├── cluster
 │       │   └── hairpin.def
 │       ├── scripts
@@ -86,19 +86,19 @@ Generated figures and other output files are omitted from the structure above fo
 The one-dimensional double-well example is contained in:
 
 ```text
-DoubleWell/
+double_well/
 ```
 
 The complete inference workflow is implemented in:
 
 ```text
-DoubleWell/DoubleWell_Inference.ipynb
+double_well/double_well_inference.ipynb
 ```
 
 To run the notebook:
 
 ```bash
-jupyter notebook DoubleWell/DoubleWell_Inference.ipynb
+jupyter notebook double_well/double_well_inference.ipynb
 ```
 
 The notebook performs the inference and reproduces the corresponding double-well results.
@@ -114,21 +114,21 @@ The polymer-hairpin calculation consists of three main stages:
 The corresponding directories are:
 
 ```text
-PolymerHairpin/
-├── Simulation/
-├── Inference/
-└── Plotting/
+polymer_hairpin/
+├── simulation/
+├── inference/
+└── plotting/
 ```
 
 A self-contained Colab demonstration is additionally provided in:
 
 ```text
-PolymerHairpin/Hairpin_Colab_Demo.ipynb
+polymer_hairpin/hairpin_demo.ipynb
 ```
 
 ## Colab demonstration
 
-`Hairpin_Colab_Demo.ipynb` provides a self-contained version of the polymer-hairpin workflow that can be run in Google Colab or locally in Jupyter. It includes trajectory generation, work-distribution sampling, full-coordinate EquiNET inference, coarse-grained inference, and visualization routines.
+`hairpin_demo.ipynb` provides a self-contained version of the polymer-hairpin workflow that can be run in Google Colab or locally in Jupyter. It includes trajectory generation, work-distribution sampling, full-coordinate EquiNET inference, coarse-grained inference, and visualization routines.
 
 To reduce the computational cost of running the complete workflow interactively, the demonstration notebook uses a coarser integration timestep,
 
