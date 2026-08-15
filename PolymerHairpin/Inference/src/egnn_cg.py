@@ -29,8 +29,8 @@ print(f"Saving ML outputs to:        {output_dir}")
 # ================================================================
 # LOAD FULL DATA AS MEMMAP
 # ================================================================
-traj_fwd_all = np.load(os.path.join(data_dir, "traj_fwd.npy"), mmap_mode="r")[:, ::10]
-traj_rev_all = np.load(os.path.join(data_dir, "traj_rev.npy"), mmap_mode="r")[:, ::10]
+traj_fwd_all = np.load(os.path.join(data_dir, "traj_fwd.npy"), mmap_mode="r")
+traj_rev_all = np.load(os.path.join(data_dir, "traj_rev.npy"), mmap_mode="r")
 
 print("traj_fwd_all shape:", traj_fwd_all.shape)
 print("traj_rev_all shape:", traj_rev_all.shape)
