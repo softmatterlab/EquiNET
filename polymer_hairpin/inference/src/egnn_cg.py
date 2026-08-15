@@ -79,7 +79,7 @@ traj_fwd_train = traj_fwd_all[:N_train, :, selected_bead_ids_np, 0:1]
 traj_rev_train = traj_rev_all[:N_train, :, selected_bead_ids_np, 0:1]
 
 dt = 1e-5
-store_stride = 500
+store_stride = 5000
 dt_inf = store_stride * dt
 t_max = (L - 1) * dt_inf
 
