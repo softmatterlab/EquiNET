@@ -16,7 +16,7 @@ from tqdm import trange
 # DATA DIRECTORY
 # ================================================================
 if len(sys.argv) < 3:
-    raise ValueError("Usage: python egnn_fast_100000.py DATA_DIR OUTPUT_DIR")
+    raise ValueError("Usage: python egnn_cg.py DATA_DIR OUTPUT_DIR")
 
 data_dir = sys.argv[1]
 output_dir = sys.argv[2]
@@ -72,11 +72,30 @@ print("Native pairs:", native_pairs)
 print("Using only x coordinates of original beads:", selected_bead_ids)
 print(f"Reduced input shape per frame: n_beads={n_beads}, coord_dim={coord_dim}")
 
-# Training subset only
-N_train = min(10000, N_all)
+# ================================================================
+# DISJOINT TRAIN / TEST SPLIT
+# ================================================================
+N_train = N_all // 2
+N_test = N_all - N_train
 
-traj_fwd_train = traj_fwd_all[:N_train, :, selected_bead_ids_np, 0:1]
-traj_rev_train = traj_rev_all[:N_train, :, selected_bead_ids_np, 0:1]
+train_start = 0
+train_end = N_train
+
+test_start = N_train
+test_end = N_all
+
+traj_fwd_train = traj_fwd_all[
+    train_start:train_end, :, selected_bead_ids_np, 0:1
+]
+traj_rev_train = traj_rev_all[
+    train_start:train_end, :, selected_bead_ids_np, 0:1
+]
+
+traj_fwd_test = traj_fwd_all[test_start:test_end]
+traj_rev_test = traj_rev_all[test_start:test_end]
+
+print(f"Training trajectories: {train_start}:{train_end}  (N={N_train})")
+print(f"Testing trajectories : {test_start}:{test_end}  (N={N_test})")
 
 dt = 1e-5
 store_stride = 5000
@@ -85,7 +104,7 @@ t_max = (L - 1) * dt_inf
 
 print(
     f"dt={dt}, dt_inf={dt_inf}, L={L}, "
-    f"N_train={N_train}, N_eval={N_all}, "
+    f"N_train={N_train}, N_test={N_test}, "
     f"n_beads={n_beads}, coord_dim={coord_dim}, t_max={t_max:.6f}"
 )
 
@@ -514,7 +533,7 @@ if device.type == "cuda":
     torch.cuda.empty_cache()
 
 print("\n=== Evaluating forward sigma(t) over all trajectories ===")
-sigma_fwd = eval_sigma_from_raw(net_fwd, traj_fwd_all, time_fwd, "forward")
+sigma_fwd = eval_sigma_from_raw(net_fwd, traj_fwd_test, time_fwd, "forward")
 
 if device.type == "cuda":
     torch.cuda.empty_cache()
@@ -535,7 +554,7 @@ if device.type == "cuda":
     torch.cuda.empty_cache()
 
 print("\n=== Evaluating reverse sigma(t) over all trajectories ===")
-sigma_rev = eval_sigma_from_raw(net_rev, traj_rev_all, time_rev, "reverse")
+sigma_rev = eval_sigma_from_raw(net_rev, traj_rev_test, time_rev, "reverse")
 
 if device.type == "cuda":
     torch.cuda.empty_cache()
