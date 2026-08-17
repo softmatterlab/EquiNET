@@ -9,7 +9,7 @@ The method is named EquiNET and it estimates equilibrium free-energy differences
 The repository contains two applications:
 
 * a one-dimensional double-well demonstration;
-* a three-dimensional polymer-hairpin model analyzed using a time-conditioned E(3)-equivariant graph neural networks (EGNNs).
+* a three-dimensional polymer-hairpin model analyzed using a time-conditioned E(3)-equivariant graph neural network (EGNN).
 
 A self-contained demonstration notebook is provided for the double well demonstration
 
