@@ -18,7 +18,7 @@ from tqdm import trange
 # ================================================================
 if len(sys.argv) < 4:
     raise ValueError(
-        "Usage: python egnn_fast_multisize_heldout.py "
+        "Usage: python egnn.py "
         "DATA_DIR OUTPUT_DIR N_DATA [SEED]"
     )
 

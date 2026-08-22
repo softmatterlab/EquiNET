@@ -6,18 +6,18 @@ This repository contains the simulation, inference, and analysis code accompanyi
 
 The method is named EquiNET and it estimates equilibrium free-energy differences from nonequilibrium trajectories by inferring entropy production.
 
-The repository contains two applications:
+The repository contains the code to apply EquiNET to two systems:
 
-* a one-dimensional double-well demonstration;
+* a one-dimensional particle in a double-well system;
 * a three-dimensional polymer-hairpin model analyzed using a time-conditioned E(3)-equivariant graph neural network (EGNN).
 
-A self-contained demonstration notebook is provided for the double well demonstration
+A self-contained demonstration notebook is provided for the double well example, and is sufficient to reproduce the results provided in the paper. 
 
-The repository for the polymer hairpin model includes simulation and inference code and scripts used to generate the datasets, and Apptainer definition files specifying the computational environments used for the simulations and neural-network training.
+A self-contained demonstration notebook is provided for the polymer-hairpin example and can be run directly in Google Colab. To keep the demonstration computationally lightweight, it uses a larger integration time step and fewer trajectory realizations than the production simulations reported in the paper
 
-The full polymer-hairpin datasets are computationally intensive to generate and were produced using high-performance computing resources. The simulations are divided into independent batches that can be run in parallel on a compute cluster. The largest dataset used in the paper contains (10^5) trajectories, but substantially smaller datasets already provide good inference results, with approximately 500--1000 trajectories sufficient in many of the cases considered here.
+The full polymer-hairpin datasets are computationally intensive to generate and were produced using high-performance computing resources. The repository for the polymer hairpin model includes simulation and inference code and scripts used to generate the datasets, and Apptainer definition files specifying the computational environments used for the simulations and neural-network training.
 
-A self-contained demonstration notebook is also provided for the polymer-hairpin example. To make the complete workflow practical to run interactively, this notebook uses a coarser integration timestep than the production simulations used for the paper. The distinction between the demonstration and production settings is described below.
+The simulations are divided into independent batches that can be run in parallel on a compute cluster. The largest dataset used in the paper contains (10^5) trajectories each with about 10^6 integration steps.
 
 ## Installation
 
@@ -52,8 +52,6 @@ Depending on the HPC system, Apptainer images may need to be built outside the c
 ├── README.md
 ├── double_well
 │   ├── double_well_inference.ipynb
-│   ├── protocol_plot.pdf
-│   └── work_entropy.pdf
 │
 ├── polymer_hairpin
 │   ├── hairpin_demo.ipynb
@@ -79,32 +77,6 @@ Depending on the HPC system, Apptainer images may need to be built outside the c
 └── requirements.txt
 ```
 
-## Demonstration notebook for the polymer hairpin model
-
-`polymer_hairpin/hairpin_demo.ipynb` provides a self-contained version of the polymer-hairpin workflow that can be run in Google Colab or locally in Jupyter.
-
-The notebook includes:
-
-* trajectory generation;
-* work-distribution sampling;
-* full-coordinate EquiNET inference;
-* coarse-grained EquiNET inference;
-* analysis and visualization routines.
-
-To reduce the computational cost of running the complete workflow interactively, the demonstration notebook uses a coarser integration timestep,
-
-```text
-dt = 1e-4
-```
-
-instead of the finer timestep used for the production calculations reported in the paper,
-
-```text
-dt = 1e-5
-```
-
-The number of integration steps and the storage strides in the demonstration notebook are reduced by the corresponding factor of 10. The production scripts in `polymer_hairpin/simulation/` and `polymer_hairpin/inference/` retain the numerical settings used for the paper.
-
 ## 1. Generating polymer-hairpin trajectories
 
 The production simulation code is located in:
@@ -121,7 +93,7 @@ For the production simulations used in the paper, the integration timestep is:
 dt = 1e-5
 ```
 
-A trajectory contains approximately (9\times10^5) integration steps. To reduce storage requirements, configurations are not written at every integration step; instead, the system is stored every 5000 simulation steps.
+A trajectory contains approximately (9\times10^5) integration steps. To reduce storage requirements, configurations are not written at every integration step; instead, the state is stored every 5000 simulation steps.
 
 ### Running production simulations on a cluster
 
@@ -158,8 +130,6 @@ Users should check:
 * Apptainer image paths;
 * input and output directories;
 * filesystem paths specific to the cluster.
-
-The number of submitted batches can be reduced depending on the desired dataset size. For example, a single batch produces 1000 trajectories and is already sufficient for testing the complete inference pipeline.
 
 ### Merging simulation batches
 
@@ -212,18 +182,9 @@ Before running the inference, users should check the paths to:
 
 * the merged simulation dataset;
 * the output directory;
-* the Apptainer image;
-* any model or training parameters specified in the submission script.
+* the Apptainer image.
 
 ## Recommended workflow
-
-For users interested primarily in testing the method, we recommend starting with:
-
-```text
-polymer_hairpin/hairpin_demo.ipynb
-```
-
-This provides the simplest way to run the complete simulation and inference pipeline with reduced computational cost.
 
 For users who want to reproduce the production workflow more closely:
 
