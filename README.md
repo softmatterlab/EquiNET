@@ -2,7 +2,7 @@
 
 This repository contains the simulation, inference, and analysis code accompanying the paper:
 
-> **Inferring Equilibrium Free Energy Differences from Nonequilibrium Fluctuations in High-Dissipation Regimes**
+> **Free-Energy Differences from Nonequilibrium Fluctuations in High Dissipation**
 
 The method is named EquiNET and it estimates equilibrium free-energy differences from nonequilibrium trajectories by inferring entropy production.
 
