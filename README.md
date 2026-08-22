@@ -17,7 +17,7 @@ A self-contained demonstration notebook is provided for the polymer-hairpin exam
 
 The full polymer-hairpin datasets are computationally intensive to generate and were produced using high-performance computing resources. The repository for the polymer hairpin model includes simulation and inference code and scripts used to generate the datasets, and Apptainer definition files specifying the computational environments used for the simulations and neural-network training.
 
-The simulations are divided into independent batches that can be run in parallel on a compute cluster. The largest dataset used in the paper contains (10^5) trajectories each with about 10^6 integration steps.
+The simulations are divided into independent batches that can be run in parallel on a compute cluster. The largest dataset used in the paper contains ($10^5$) trajectories each with about $10^6$ integration steps.
 
 ## Installation
 
@@ -93,7 +93,7 @@ For the production simulations used in the paper, the integration timestep is:
 dt = 1e-5
 ```
 
-A trajectory contains approximately (9\times10^5) integration steps. To reduce storage requirements, configurations are not written at every integration step; instead, the state is stored every 5000 simulation steps.
+A trajectory contains approximately ($9\times10^5$) integration steps. To reduce storage requirements, configurations are not written at every integration step; instead, the state is stored every 5000 simulation steps.
 
 ### Running production simulations on a cluster
 
